@@ -1,0 +1,13 @@
+catboost>=1.2.10
+ipykernel>=7.2.0
+kaggle>=2.0.0
+kvbiii_ml>=0.1.0
+kvbiii_plots>=0.3.0
+lightgbm>=4.6.0
+xgboost>=3.2.0
+
+# To install lightgbm with CUDA support, use the following command:
+# pip install --force-reinstall --no-binary lightgbm \
+#     --config-settings=cmake.define.USE_CUDA=ON \
+#     --config-settings=cmake.define.CMAKE_CUDA_HOST_COMPILER=/usr/bin/g++-12 \
+#     lightgbm==4.6.0
