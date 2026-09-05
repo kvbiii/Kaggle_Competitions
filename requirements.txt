@@ -6,8 +6,12 @@ kvbiii_plots>=0.3.0
 lightgbm>=4.6.0
 xgboost>=3.2.0
 
-# To install lightgbm with CUDA support, use the following command:
+# To install lightgbm with CUDA support (requires system CUDA toolkit + gcc-12/g++-12 +
+# libnccl-dev already installed via apt, since nvcc 12.0 rejects the default gcc 13 on
+# Ubuntu 24.04), use the following command:
 # pip install --force-reinstall --no-binary lightgbm \
 #     --config-settings=cmake.define.USE_CUDA=ON \
+#     --config-settings=cmake.define.CMAKE_C_COMPILER=/usr/bin/gcc-12 \
+#     --config-settings=cmake.define.CMAKE_CXX_COMPILER=/usr/bin/g++-12 \
 #     --config-settings=cmake.define.CMAKE_CUDA_HOST_COMPILER=/usr/bin/g++-12 \
-#     lightgbm==4.6.0
+#     lightgbm==4.7.0
