@@ -4,7 +4,6 @@ Run one phase per fresh Claude Code session, opened in `Kaggle_Competitions/`. P
 
 | # | File | Result |
 |---|---|---|
-| 1 | `phase-1-oof-ensembling.md` | kvbiii-ml saves OOF predictions, hill-climbs and stacks from arrays, cross-fitted m-estimate TE; editable install in the Kaggle venv |
 | 2 | `phase-2-s6e11-loop.md` | S6E11 loop infrastructure, GBDT/GLM ladder, first stacked submission, review checkpoint |
 | 3 | written from HANDOFF after phase 2 | S6E11 NN members, test refit, final 2 picks by 2026-11-30 20:00 local |
 | 4 | written from HANDOFF after the close | private-LB retro, template notebooks, root `CLAUDE.md` and loop skill for December |
