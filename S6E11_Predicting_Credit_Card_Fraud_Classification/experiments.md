@@ -104,3 +104,28 @@ Appended by `common.run_member` and `gate.py`. Trees: refit tree count (full) or
 | 11-27 12:02 | lgbm31_raw | full | 0.94503 | 0.94286 0.94630 0.94066 0.94524 0.95012 | 1.3 min | 286 |
 | 11-27 12:02 | GATE single lgbm31_raw vs baseline | full | Δ -0.00163 | Δ per fold -0.00178 -0.00120 -0.00191 -0.00157 -0.00168 | 0/5 up | FAIL |
 | 11-27 12:02 | QUEUE done queue_check.txt | - | - | - | - | - |
+| 11-27 12:04 | catboost_cat | screen | 0.94445 | 0.93853 0.94793 0.94690 | 1.3 min | [680, 1039, 973] |
+| 11-27 12:04 | QUEUE catboost_cat | full | est 23.2 min | started | - | - |
+| 11-27 12:29 | catboost_cat | full | 0.94637 | 0.94442 0.94665 0.94198 0.94664 0.95218 | 24.6 min | 1957 |
+| 11-27 12:29 | GATE blend catboost_cat vs [te_xgb glm xgb_d2_te glm_boost baseline] | full | 0.95064 → 0.95064, Δ -0.00001 | Δ per fold -0.00000 -0.00003 -0.00001 +0.00001 -0.00000 | 1/5 up, weight 0.037, max ρ 0.96315 | FAIL |
+| 11-27 12:30 | glm_boost_lgbm4 | screen | 0.94869 | 0.94223 0.95317 0.95066 | 1.1 min | [125, 135, 416] |
+| 11-27 12:30 | QUEUE glm_boost_lgbm4 | full | est 19.1 min | started | - | - |
+| 11-27 12:39 | glm_boost_lgbm4 | full | 0.95029 | 0.94825 0.95042 0.94691 0.95031 0.95558 | 8.8 min | 816 |
+| 11-27 12:40 | GATE blend glm_boost_lgbm4 vs [te_xgb glm xgb_d2_te glm_boost baseline] | full | 0.95064 → 0.95066, Δ +0.00002 | Δ per fold +0.00001 +0.00001 +0.00001 +0.00003 +0.00002 | 5/5 up, weight 0.517, max ρ 0.99949 | FAIL |
+| 11-27 12:41 | PRUNE loo te_xgb [5 members] | full | Δ -0.00000 | Δ per fold -0.00000 -0.00000 +0.00000 -0.00000 -0.00001 | 1/5 up | fail | DROP |
+| 11-27 12:41 | PRUNE loo glm [5 members] | full | Δ -0.00000 | Δ per fold -0.00000 -0.00000 +0.00000 -0.00000 +0.00000 | 0/5 up | fail | - |
+| 11-27 12:41 | PRUNE loo xgb_d2_te [5 members] | full | Δ +0.00005 | Δ per fold +0.00008 +0.00010 -0.00004 +0.00005 +0.00009 | 4/5 up | keep | - |
+| 11-27 12:41 | PRUNE loo glm_boost [5 members] | full | Δ +0.00017 | Δ per fold +0.00007 -0.00001 +0.00030 +0.00027 +0.00020 | 4/5 up | keep | - |
+| 11-27 12:41 | PRUNE loo baseline [5 members] | full | Δ +0.00009 | Δ per fold -0.00000 +0.00014 +0.00009 +0.00015 +0.00008 | 4/5 up | keep | - |
+| 11-27 12:41 | PRUNE loo glm [4 members] | full | Δ +0.00000 | Δ per fold +0.00000 -0.00000 -0.00000 +0.00000 +0.00000 | 3/5 up | fail | DROP |
+| 11-27 12:41 | PRUNE loo xgb_d2_te [4 members] | full | Δ +0.00011 | Δ per fold +0.00023 +0.00018 -0.00005 +0.00009 +0.00012 | 4/5 up | keep | - |
+| 11-27 12:41 | PRUNE loo glm_boost [4 members] | full | Δ +0.00017 | Δ per fold +0.00008 -0.00001 +0.00030 +0.00027 +0.00019 | 4/5 up | keep | - |
+| 11-27 12:41 | PRUNE loo baseline [4 members] | full | Δ +0.00011 | Δ per fold +0.00004 +0.00016 +0.00011 +0.00017 +0.00007 | 5/5 up | keep | - |
+| 11-27 12:42 | PRUNE loo xgb_d2_te [3 members] | full | Δ +0.00011 | Δ per fold +0.00023 +0.00018 -0.00005 +0.00009 +0.00012 | 4/5 up | keep | - |
+| 11-27 12:42 | PRUNE loo glm_boost [3 members] | full | Δ +0.00032 | Δ per fold +0.00014 +0.00015 +0.00058 +0.00035 +0.00036 | 5/5 up | keep | - |
+| 11-27 12:42 | PRUNE loo baseline [3 members] | full | Δ +0.00011 | Δ per fold +0.00004 +0.00016 +0.00011 +0.00016 +0.00007 | 5/5 up | keep | - |
+| 11-27 12:44 | STACK hill_climb [3 members] | full | 0.95065 | 0.94870 0.95096 0.94702 0.95067 0.95589 | vs best single +0.00039 | xgb_d2_te=0.341 glm_boost=0.512 baseline=0.146 |
+| 11-27 12:44 | STACK logistic_stack [3 members] | full | 0.95067 | 0.94874 0.95098 0.94703 0.95068 0.95589 | vs best single +0.00041 | xgb_d2_te=0.504 glm_boost=0.680 baseline=0.176 |
+| 11-27 12:44 | QUEUE done batch1.txt | - | - | - | - | - |
+| 11-27 12:45 | GATE blend glm_boost_lgbm4 vs [xgb_d2_te glm_boost baseline] | full | 0.95065 → 0.95066, Δ +0.00002 | Δ per fold +0.00001 +0.00001 +0.00002 +0.00003 +0.00002 | 5/5 up, weight 0.524, max ρ 0.99949 | FAIL |
+| 11-27 12:45 | GATE blend catboost_cat vs [xgb_d2_te glm_boost baseline] | full | 0.95065 → 0.95064, Δ -0.00001 | Δ per fold -0.00000 -0.00002 -0.00001 +0.00001 +0.00000 | 2/5 up, weight 0.025, max ρ 0.96315 | FAIL |

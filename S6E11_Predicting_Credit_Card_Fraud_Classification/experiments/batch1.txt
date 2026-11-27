@@ -1,0 +1,4 @@
+# Phase 3 batch 1: new GBDT family, second GLM-boost view, then prune
+catboost_cat blend
+glm_boost_lgbm4 blend
+prune

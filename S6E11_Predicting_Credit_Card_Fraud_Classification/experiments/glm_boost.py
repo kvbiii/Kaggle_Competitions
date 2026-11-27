@@ -16,6 +16,7 @@ from common import (
     TARGET,
     Member,
     best_trees,
+    es_param,
     fit_cv,
     load_data,
     load_folds,
@@ -63,22 +64,22 @@ def fold_data(X: pd.DataFrame, y: pd.Series, X_test: pd.DataFrame | None, valid:
     return X.assign(**{OFFSET: offsets}), y, test_k, np.where(valid, 0, -1)
 
 
-def run(mode: str) -> None:
-    """Holdout pass per outer fold to read best trees, then (full) a fixed-tree refit; save and log."""
+def run(mode: str, cand: Member | None = None) -> None:
+    """Holdout pass per outer fold to read best trees, then (full) a fixed-tree refit; save and log (default member: glm_boost)."""
     train, test = load_data()
     y_all = train[TARGET].to_numpy()
     folds = load_folds(y_all)
     rows, fold_ids = screen_split(folds, y_all, **SCREEN) if mode == "screen" else (np.arange(len(train)), folds)
     X, y = train.iloc[rows][FEATURES], train.iloc[rows][TARGET]
     X_test = test[FEATURES] if mode == "full" else None
-    cand, start = member(), time.perf_counter()
+    cand, start = cand or member(), time.perf_counter()
     scored = np.unique(fold_ids[fold_ids >= 0])
     datasets = [fold_data(X, y, X_test, fold_ids == k) for k in scored]
     passes = [fit_cv(cand, cand.model, data, ES_HOLDOUT) for data in datasets]
     config = {**cand.config, "mode": mode, "screen": SCREEN if mode == "screen" else None, "best_trees": [best_trees(t.fitted_estimators_[0]) for t, _ in passes]}
     if mode == "full":
         config["refit_trees"] = math.ceil(REFIT_FACTOR * np.mean(config["best_trees"]))
-        refit = clone(cand.model).set_params(n_estimators=config["refit_trees"], early_stopping_rounds=None)
+        refit = clone(cand.model).set_params(n_estimators=config["refit_trees"], **{es_param(cand.model): None})
         passes = [fit_cv(cand, refit, data, None) for data in datasets]
     oof = np.full(len(rows), np.nan)
     for k, (trainer, _) in zip(scored, passes, strict=True):
@@ -88,8 +89,8 @@ def run(mode: str) -> None:
     runtime = time.perf_counter() - start
     config["runtime_s"] = round(runtime, 1)
     keep = fold_ids >= 0
-    save_member(member_path(NAME, mode), {"oof": oof[keep], "test": test_pred, "fold_auc": fold_auc, "rows": rows[keep], "fold": fold_ids[keep]}, config)
-    log_line(f"| {datetime.now():%m-%d %H:%M} | {NAME} | {mode} | {fold_auc.mean():.5f} | {' '.join(f'{a:.5f}' for a in fold_auc)} | {runtime / 60:.1f} min | {config.get('refit_trees', config['best_trees'])} |")
+    save_member(member_path(cand.name, mode), {"oof": oof[keep], "test": test_pred, "fold_auc": fold_auc, "rows": rows[keep], "fold": fold_ids[keep]}, config)
+    log_line(f"| {datetime.now():%m-%d %H:%M} | {cand.name} | {mode} | {fold_auc.mean():.5f} | {' '.join(f'{a:.5f}' for a in fold_auc)} | {runtime / 60:.1f} min | {config.get('refit_trees', config['best_trees'])} |")
 
 
 if __name__ == "__main__":
