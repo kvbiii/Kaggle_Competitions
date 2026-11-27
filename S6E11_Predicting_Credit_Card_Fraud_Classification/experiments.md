@@ -50,6 +50,7 @@ Submission file: `submissions/1127_1048_logistic_stack_5m.csv` (rank-scaled, tes
 | date | file | CV | public LB | rank | note |
 |---|---|---|---|---|---|
 | 2026-11-02 | baseline notebook (OOF approach) | 0.9468 | 0.94677 | 2343/3274 (on 11-26) | user's own |
+| 2026-11-27 10:51 | `1127_1048_logistic_stack_5m.csv` | 0.95066 | **0.95170** | ~1039/3322 | approved by user; LB − CV = +0.00104 (the baseline had ≈ 0); public top-10% cutoff 0.95533 |
 
 ## Run log
 
