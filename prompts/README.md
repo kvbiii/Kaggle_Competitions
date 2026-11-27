@@ -4,7 +4,6 @@ Run one phase per fresh Claude Code session, opened in `Kaggle_Competitions/`. P
 
 | # | File | Result |
 |---|---|---|
-| 3 | `phase-3-s6e11-final.md` | S6E11 queue runner, NN/CatBoost members, test refit, final 2 picks by 2026-11-30 20:00 local, Advanced/Ensemble notebooks |
 | 4 | written from HANDOFF after the close | private-LB retro, template notebooks, root `CLAUDE.md` and loop skill for December |
 
 Each phase ends by appending a short section to `prompts/HANDOFF.md`: what was built, decisions made, anything left open. The next phase reads it first.

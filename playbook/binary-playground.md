@@ -69,3 +69,6 @@ Own best CV 0.9608 (LGBM-dominated GBDT ensemble on KBins + count + target encod
 
 ### S6E11 (credit card fraud), closes 2026-11-30
 Start: LB 0.94677 (baseline CV ~0.9468), rank 2343/3274 on 2026-11-26. Best self-built public notebook ≈ LB 0.9515 (rank ~1090); everything ≥ 0.953 used public OOF banks or LB probing. Target: self-built ≥ 0.951. Retro goes here after the private LB.
+- Phase 3 stub (2026-11-27), private LB pending. Final picks: pruned 3-member logistic stack (xgb_d2_te, glm_boost, baseline), CV 0.95067. A = fold-average test, public 0.95167; B = top-2 refitted on all rows, public 0.95173.
+- What did not add to this library (blend Δ ≤ +2e-5 each): CatBoost with all columns as categories (single 0.94637), RealMLP (0.94993), TabM (0.94932), GLM-boost on LGBM-4 (0.95029, ρ 0.9995 with the XGB version), group-mean deviations (+2e-5 single). TE seed bagging over 3 cross-fit seeds **hurt**: −0.0032 on the screen.
+- Lever 5 (full refit) gave +6e-5 public over the fold average at file ρ 0.9988. Pruning 5 → 3 members kept the CV (0.95066 → 0.95067).
