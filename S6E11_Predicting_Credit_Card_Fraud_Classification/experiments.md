@@ -74,6 +74,15 @@ The bagging kill is not a wrapper bug: `BaggedTargetEncoder` with the single see
 
 Library after Phase 3 batches: `xgb_d2_te glm_boost baseline`. Logistic stack **0.95067** (hill climb 0.95065), up from 0.95066 with 5 members. NN canary (TE pipeline + integer categories, shuffled labels, seeds 2–4): 0.4916, same as the TE pipeline alone (0.4914); seed 0 gave 0.475, below chance, so not leakage.
 
+## Final picks (rule and both files confirmed by the user, 2026-11-27; the user selects them in the Kaggle UI)
+
+Rule: **A** = the best nested-CV blend of the final library, with test = average of the 5 fold models (pure CV, nothing chosen on the LB). **B** = the same blend with the top-2 members by stack weight refitted once on all rows (lever 5). B rests on one binary LB check (B − A = +6e-5 at file ρ 0.9988, gap noise ≈ 1e-5), not on picking the best of many probes.
+
+| pick | file | Kaggle ref | nested CV | public LB |
+|---|---|---|---|---|
+| A | `submissions/1127_1244_logistic_stack_3m.csv` | 59001979 | 0.95067 | 0.95167 |
+| B | `submissions/1127_1342_logistic_stack_3m_refit-glm_boost-xgb_d2_te.csv` | 59001983 | 0.95067 | 0.95173 |
+
 ## Run log
 
 Appended by `common.run_member` and `gate.py`. Trees: refit tree count (full) or best trees per fold (screen).
