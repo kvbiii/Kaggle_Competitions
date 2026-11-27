@@ -1,5 +1,6 @@
 """Shared plumbing for S6E11 experiments: data, fixed folds, screen subsets, member files, run log."""
 
+import copy
 import json
 import math
 import sys
@@ -22,7 +23,7 @@ from kvbiii_ml.data_processing.preprocessing.categorical_encoding.target_encoder
     TargetEncoderWithOriginal,
 )
 from kvbiii_ml.modeling.training.cross_validation import CrossValidationTrainer
-from sklearn.base import BaseEstimator, clone
+from sklearn.base import BaseEstimator
 from sklearn.model_selection import PredefinedSplit, StratifiedKFold
 from sklearn.pipeline import Pipeline
 
@@ -52,7 +53,7 @@ ES_PARAMS = ("early_stopping_rounds", "early_stopping_round")
 
 @dataclass
 class Member:
-    """One OOF-library candidate: a model, its input columns and an optional per-fold pipeline."""
+    """One OOF-library candidate: a model, its input columns, an optional per-fold pipeline; `val_holdout` gives non-ES models (NNs) the inner holdout as validation."""
 
     name: str
     model: BaseEstimator
@@ -60,6 +61,7 @@ class Member:
     pipeline: Pipeline | None = None
     config: dict = field(default_factory=dict)
     offset_column: str | None = None
+    val_holdout: bool = False
 
 
 def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -154,7 +156,9 @@ def es_param(model: BaseEstimator) -> str | None:
 
 
 def best_trees(model: BaseEstimator) -> int:
-    """Return the number of trees at the best iteration of a fitted XGB or LGBM model."""
+    """Return the number of trees at the best iteration of a fitted XGB, LGBM or CatBoost model."""
+    if type(model).__name__.startswith("CatBoost"):
+        return int(model.best_iteration_) + 1
     if hasattr(model, "best_iteration_"):
         return int(model.best_iteration_)
     return int(model.best_iteration) + 1
@@ -184,14 +188,14 @@ def run_member(member: Member, mode: str) -> dict:
     data = (train.iloc[rows][member.features], train.iloc[rows][TARGET], X_test, fold_ids)
     start = time.perf_counter()
     es = es_param(member.model)
-    trainer, test_pred = fit_cv(member, member.model, data, ES_HOLDOUT if es else None)
+    trainer, test_pred = fit_cv(member, member.model, data, ES_HOLDOUT if es or member.val_holdout else None)
     config = {**member.config, "mode": mode, "screen": SCREEN if mode == "screen" else None}
     if es:
         config["best_trees"] = [best_trees(m) for m in trainer.fitted_estimators_]
     if es and mode == "full":
         n_trees = math.ceil(REFIT_FACTOR * np.mean(config["best_trees"]))
         config["refit_trees"] = n_trees
-        trainer, test_pred = fit_cv(member, clone(member.model).set_params(n_estimators=n_trees, **{es: None}), data, None)
+        trainer, test_pred = fit_cv(member, copy.deepcopy(member.model).set_params(n_estimators=n_trees, **{es: None}), data, None)
     runtime = time.perf_counter() - start
     scored = fold_ids >= 0
     fold_auc = np.asarray(trainer.valid_scores_)

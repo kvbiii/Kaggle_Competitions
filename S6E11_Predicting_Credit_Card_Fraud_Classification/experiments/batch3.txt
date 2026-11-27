@@ -1,0 +1,3 @@
+# Phase 3 batch 3: cheap extras as xgb_d2_te variants (gated single)
+xgb_d2_te_bag single xgb_d2_te
+xgb_d2_te_gp single xgb_d2_te

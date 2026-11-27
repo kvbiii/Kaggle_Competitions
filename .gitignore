@@ -135,5 +135,6 @@ dmypy.json
 # Kaggle loop: member OOFs, fold files, submissions
 oof/
 submissions/
+*.state.json
 *.npz
 *.npy

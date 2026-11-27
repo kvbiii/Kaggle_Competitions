@@ -138,3 +138,90 @@ Pipeline([("keys", DigitKeysFeatureGenerator(cols)),
 3. **Test-side full refit** (lever 5): one fit on all rows with 1.25 × best trees and encoders refitted on all rows. Try it on glm_boost and xgb_d2_te. CV cannot score it, so it costs one LB probe each. Keep a CV-backed fold-average submission as one of the 2 final picks.
 4. **Library pruning + a second GLM-boost view** (LGBM-4 on the GLM margin). Cheap, since the GLM fits can be reused.
 5. **Cheap extras**: encoder seed bagging (+1e-5 to 6e-5), label-free group profiles (+1e-4 in S6E11 reports), original-data per-value lookup rates (Q1, untested).
+
+## Phase 3: S6E11 queue runner, new families, final picks, notebooks (2026-11-27)
+
+### What was built
+- Branch `s6e11/phase-3-final` in `Kaggle_Competitions`. kvbiii-ml is unchanged (still 2ecf896).
+- `S6E11_.../experiments/`:
+  - `run_queue.py`: the queue runner. `test_run_queue.py` has 12 pytest checks for the kill rule, hours guard, resume, ideas parsing and prune selection; they take ~1 s.
+  - `prune.py`: leave-one-out library pruning. `refit.py`: test-side full refit (lever 5). `stack.py --refit a,b`: swaps those members' test columns for their refits.
+  - Idea scripts: `catboost_cat`, `glm_boost_lgbm4`, `realmlp`, `tabm`, `xgb_d2_te_bag`, `xgb_d2_te_gp`.
+  - Ideas files: `queue_check.txt`, `batch1.txt`, `batch2.txt`, `batch3.txt`.
+  - `common.py`:
+    - `Member.val_holdout` gives non-ES models (NNs) the inner holdout as `X_val`;
+    - CatBoost `best_iteration_` is 0-based (+1);
+    - `copy.deepcopy` instead of `sklearn.clone`, because clone fails on CatBoost `cat_features`.
+  - `glm_boost.run(mode, cand)` takes the booster, so LGBM reuses it.
+  - `test_plumbing.py` has a parametrised shuffled-label canary for every new input builder; 21 tests in total, 2.7 min.
+- `Modeling_Advanced.ipynb` (4 s headless) and `Modeling_Ensemble.ipynb` (136 s; it asserts the `stack.py` scores and its submission equals pick A). Both read `oof/`, `library.txt` and `experiments.md` only.
+
+### Queue contract (what Phase 4 templates)
+- `python run_queue.py <ideas.txt>`. Lines are `<idea> blend` (new family, nested hill-climb gate), `<idea> single <ref>` (variant replacing `ref`, single-model gate) or `prune`. `#` starts a comment.
+- Steps per idea:
+  1. `screen` and `full` run `python -W ignore <idea>.py screen|full` in a subprocess. That frees the GPU, a crash fails only that idea, and it covers both `run_member` and custom `run()` scripts.
+  2. `kill`.
+  3. `gate` and `library` (on PASS, the idea replaces `ref` or is appended).
+  4. `stack` (`stack.main()`, writes a submission file).
+  - `prune` = `prune`, then `stack`.
+- Resume: `<ideas>.state.json` (gitignored) maps `idea:step` to its result and is written atomically after each step. The results `KILL`, `FAIL`, `CRASH` and `UNCHANGED` stop that idea.
+- Kill rule: `single` only. Kill iff the screen trails `ref`'s screen by > 2% of (1 − ref AUC) **and** every scored fold is down. `blend` ideas always get a full run.
+- Hours guard: a step starts only if `now + estimate ≤ 20:00` and `now ≥ 08:00`; otherwise it logs `QUEUE WAIT` and sleeps until 08:00.
+  - Estimates: full = 18 × screen runtime; screen 15 min; gate 10; stack 8; prune 3 min × members per round.
+  - Measured actual/estimate: CatBoost 1.06, LGBM 0.46, NNs 0.43–0.47, XGB 0.78. **18× is not a hard upper bound.**
+- Log rows go into the `experiments.md` run log: `QUEUE kill-check …` (screen Δ, threshold, folds down, GO/KILL), `QUEUE <idea> | full | est …`, `QUEUE WAIT …`, `PRUNE loo …` (one row per member per round, with the drop marked) and `REFIT …`.
+- Name: `run_queue.py`, not `queue.py`. A `queue.py` next to the idea scripts would shadow the stdlib `queue` module that joblib and torch import.
+
+### Measurements
+| member | single CV | gate Δ (folds up) | verdict | runtime (full) |
+|---|---|---|---|---|
+| lgbm31_raw re-run via queue | 0.94503 (max fold diff 0.0 vs Phase 2) | −0.00163 single (0/5) | FAIL, as expected | 1.3 min |
+| catboost_cat (GPU, string copies of all numerics/flags) | 0.94637 | −0.00001 blend (1/5) | FAIL | 24.6 min |
+| glm_boost_lgbm4 | **0.95029** (best single) | +0.00002 blend (5/5), ρ 0.9995 with glm_boost | FAIL | 8.8 min |
+| prune (LOO, 5 → 3) | — | te_xgb −0.00000, then glm +0.00000 | both dropped | 1 min |
+| realmlp (S6E10 config, holdout epoch + `n_refit=1`) | 0.94993 | +0.00001 blend (3/5) | FAIL | 9.0 min |
+| tabm (tabm-mini k=32, pwl, 80% of fold) | 0.94932 | −0.00001 blend (2/5), weight 0 | FAIL | 33.0 min |
+| xgb_d2_te_bag (TE seeds 17/18/19) | screen 0.94440 | −0.00320 screen (0/3) | KILL | 0.4 min screen |
+| xgb_d2_te_gp (train-fold category-mean deviations) | 0.95023 | +0.00002 single (3/5) | FAIL | 3.6 min |
+
+- Library: `xgb_d2_te glm_boost baseline`. Logistic stack **0.95067** (hill climb 0.95065); before pruning it was 0.95066 with 5 members.
+- LB:
+  - A (3-member stack, fold-average test): CV 0.95067, public 0.95167.
+  - B (same stack, glm_boost + xgb_d2_te refitted on all rows): public **0.95173**. B − A = +6e-5 at file ρ 0.9988 (gap noise ≈ 1e-5).
+  - The Phase 2 5-member stack: 0.95170.
+- Final picks (user confirmed): A = `1127_1244_logistic_stack_3m.csv` (ref 59001979), B = `1127_1342_logistic_stack_3m_refit-glm_boost-xgb_d2_te.csv` (ref 59001983). The user selects both in the Kaggle UI; the CLI has no final-selection option.
+- Machine time in Phase 3: ≈ 1.8 h (queue runs 96 min; canaries, smoke tests, refit, notebooks and test suite ≈ 13 min).
+- Turns: each batch took 2 tool calls (launch, read results). Phase 2 needed ≥ 3 commands per idea (screen, full, gate) plus a stack (see its run log).
+
+### Decisions (2026-11-27)
+- Me, from the code: the CLI cannot mark final submissions, so the user picks in the UI. All playbook RealMLP/TabM parameter names exist in pytabkit 1.8.0.
+  - TabM has no `n_refit` (it raises `NotImplementedError`), so TabM trains on 80% of each fold with patience on the holdout.
+  - RealMLP picks its epoch on the holdout, then `n_refit=1` refits on the whole training fold (pytabkit concatenates `X_val`).
+- User: new families are never killed at the screen. Variants are killed by the relative rule (> 2% of 1 − AUC **and** all folds down) instead of a fixed 1e-3, so it carries over to other competitions.
+- User: pruning drops members automatically, one at a time, while the weakest LOO contribution fails the gate.
+- User: the refit covers the top 2 by stack weight, with **one** comparison (A vs B, 2 submits approved) instead of one probe per member.
+- User: batch 3 runs group profiles and seed bagging, but not the original data (Phase 2's teacher test lost 0.0037).
+- User: final-pick rule A (pure CV) + B (refit), and both files confirmed.
+- Me: after pruning, the two Batch 1 failures were re-gated against the 3-member library (both still FAIL). The NN canary averages seeds 2–4 like the GLM canary; seed 0 gave 0.475, below chance and equal to the plain TE pipeline.
+- Me: CatBoost uses `use_best_model=False`, so the refit pass doesn't trim trees on the scored fold, which the trainer passes as `eval_set`.
+- Me: group profiles use train-fold means only, no test rows, per the leakage rule in memory.
+
+### Open issues
+- `add_to_library`: if two `single` variants of the same `ref` both pass in one ideas file, the second is appended instead of replacing the first. Gate them against each other or run them in separate files.
+- State keys are `idea:step`, so an idea or `prune` runs at most once per ideas file.
+- Gates depend on library order. The queue does not re-gate earlier failures after a prune; it was done by hand here.
+- The Ensemble notebook takes 136 s, not the ~1 min target: two nested blenders on 700k rows. Caching would skip the blend the notebook exists to show.
+- S6E11 has plateaued for this design. Every new family has ρ ≥ 0.96 with the library and blend gains ≤ 2e-5. Public top 10% (0.95533) is far above self-built CV 0.9507; the playbook notes those scores came from public OOF banks.
+- Pre-existing: MD060 markdown-lint warnings on every `|---|` table, and the `kvbiii-ml` editable-install caveat from Phase 1.
+
+### What Phase 4 should turn into templates
+- `run_queue.py`, `gate.py`, `stack.py`, `prune.py`, `refit.py` and `common.py` as a competition-agnostic package. Column lists come from `agent/facts.json`, and ideas files are the interface. Keep the subprocess-per-training design and the state file.
+- Recalibrate the kill fraction from logged kill checks: lgbm31_raw GO → full FAIL, xgb_d2_te_bag KILL, xgb_d2_te_gp GO → full FAIL. Calibrate the full/screen estimate per model family instead of the single 18×.
+- The notebook generator: Advanced/Ensemble cells read only `oof/` and the logs (the generator script is not in the repo; the notebooks are).
+- A loop skill:
+  1. EDA facts;
+  2. baseline member;
+  3. ideas file → `run_queue.py`;
+  4. `refit.py` + `stack.py --refit` → ask before submit;
+  5. pick rule A/B.
+- The private-LB retro for S6E11 goes in the playbook after 2026-11-30.

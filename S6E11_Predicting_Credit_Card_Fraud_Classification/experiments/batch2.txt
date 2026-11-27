@@ -1,0 +1,3 @@
+# Phase 3 batch 2: NN families (pytabkit, GPU)
+realmlp blend
+tabm blend
