@@ -132,3 +132,8 @@ dmypy.json
 /.claude
 /catboost_info
 *.csv
+# Kaggle loop: member OOFs, fold files, submissions
+oof/
+submissions/
+*.npz
+*.npy

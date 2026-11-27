@@ -1,0 +1,741 @@
+{
+ "train_rows": 699960,
+ "test_rows": 299984,
+ "positive_rate": 0.0167,
+ "duplicate_train_rows": 0,
+ "columns": {
+  "amount_usd": {
+   "dtype": "float64",
+   "nunique_train": 13387,
+   "nunique_test": 10510,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.00539,
+   "mean_rows_per_value": 52.3,
+   "train_rows_with_value_seen_ge_5": 0.9839,
+   "drift": 0.0015,
+   "decimals": {
+    "0": 0.0094,
+    "1": 0.0718,
+    "2": 0.9188
+   },
+   "min": 1.0,
+   "max": 6872.69
+  },
+  "hours_since_last_txn": {
+   "dtype": "float64",
+   "nunique_train": 3633,
+   "nunique_test": 3331,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.00053,
+   "mean_rows_per_value": 192.7,
+   "train_rows_with_value_seen_ge_5": 0.9976,
+   "drift": 0.0014,
+   "decimals": {
+    "0": 0.0041,
+    "1": 0.0752,
+    "2": 0.9206
+   },
+   "min": 0.01,
+   "max": 51.98
+  },
+  "txn_count_last_24h": {
+   "dtype": "int64",
+   "nunique_train": 12,
+   "nunique_test": 11,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 58330.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0023,
+   "target_rate_by_value": {
+    "0": [
+     0.0023,
+     18462
+    ],
+    "1": [
+     0.0069,
+     92705
+    ],
+    "2": [
+     0.0128,
+     170757
+    ],
+    "3": [
+     0.0166,
+     178367
+    ],
+    "4": [
+     0.0198,
+     131869
+    ],
+    "5": [
+     0.0259,
+     69701
+    ],
+    "6": [
+     0.0351,
+     26488
+    ],
+    "7": [
+     0.0436,
+     8907
+    ],
+    "8": [
+     0.0395,
+     2252
+    ],
+    "9": [
+     0.0582,
+     378
+    ],
+    "10": [
+     0.1231,
+     65
+    ],
+    "11": [
+     0.2222,
+     9
+    ]
+   }
+  },
+  "distance_from_home_km": {
+   "dtype": "float64",
+   "nunique_train": 4365,
+   "nunique_test": 4108,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.00043,
+   "mean_rows_per_value": 160.4,
+   "train_rows_with_value_seen_ge_5": 0.998,
+   "drift": 0.002,
+   "decimals": {
+    "0": 0.0073,
+    "1": 0.0753,
+    "2": 0.9174
+   },
+   "min": 0.0,
+   "max": 57.93
+  },
+  "card_age_months": {
+   "dtype": "int64",
+   "nunique_train": 49,
+   "nunique_test": 49,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 14284.9,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0027
+  },
+  "customer_age": {
+   "dtype": "int64",
+   "nunique_train": 64,
+   "nunique_test": 64,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 10936.9,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0008
+  },
+  "account_balance_usd": {
+   "dtype": "float64",
+   "nunique_train": 43317,
+   "nunique_test": 31803,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.02223,
+   "mean_rows_per_value": 16.2,
+   "train_rows_with_value_seen_ge_5": 0.9355,
+   "drift": 0.0019,
+   "decimals": {
+    "0": 0.017,
+    "1": 0.096,
+    "2": 0.887
+   },
+   "min": 58.25,
+   "max": 99701.39
+  },
+  "cvv_retry_count": {
+   "dtype": "int64",
+   "nunique_train": 4,
+   "nunique_test": 4,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 174990.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0001,
+   "target_rate_by_value": {
+    "0": [
+     0.0093,
+     642088
+    ],
+    "1": [
+     0.0875,
+     55942
+    ],
+    "2": [
+     0.4173,
+     1905
+    ],
+    "3": [
+     0.36,
+     25
+    ]
+   }
+  },
+  "velocity_score": {
+   "dtype": "float64",
+   "nunique_train": 666,
+   "nunique_test": 644,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 4e-05,
+   "mean_rows_per_value": 1051.0,
+   "train_rows_with_value_seen_ge_5": 0.9999,
+   "drift": 0.0014,
+   "decimals": {
+    "0": 0.1596,
+    "1": 0.8404
+   },
+   "min": 0.0,
+   "max": 72.9
+  },
+  "time_of_day_hour": {
+   "dtype": "int64",
+   "nunique_train": 24,
+   "nunique_test": 24,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 29165.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0048,
+   "target_rate_by_value": {
+    "0": [
+     0.0169,
+     25806
+    ],
+    "1": [
+     0.0144,
+     29912
+    ],
+    "2": [
+     0.0167,
+     26868
+    ],
+    "3": [
+     0.0175,
+     26967
+    ],
+    "4": [
+     0.0164,
+     27349
+    ],
+    "5": [
+     0.0178,
+     27412
+    ],
+    "6": [
+     0.0171,
+     27374
+    ],
+    "7": [
+     0.0166,
+     29779
+    ],
+    "8": [
+     0.0165,
+     27153
+    ],
+    "9": [
+     0.0177,
+     29056
+    ],
+    "10": [
+     0.017,
+     29090
+    ],
+    "11": [
+     0.0168,
+     28178
+    ],
+    "12": [
+     0.0174,
+     30048
+    ],
+    "13": [
+     0.0169,
+     33994
+    ],
+    "14": [
+     0.0158,
+     28944
+    ],
+    "15": [
+     0.0176,
+     32922
+    ],
+    "16": [
+     0.0165,
+     27692
+    ],
+    "17": [
+     0.0157,
+     30978
+    ],
+    "18": [
+     0.0166,
+     27656
+    ],
+    "19": [
+     0.0161,
+     32021
+    ],
+    "20": [
+     0.0154,
+     31891
+    ],
+    "21": [
+     0.0183,
+     29074
+    ],
+    "22": [
+     0.0171,
+     31549
+    ],
+    "23": [
+     0.0162,
+     28247
+    ]
+   }
+  },
+  "day_of_week": {
+   "dtype": "int64",
+   "nunique_train": 7,
+   "nunique_test": 7,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 99994.3,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0042,
+   "target_rate_by_value": {
+    "0": [
+     0.0158,
+     100548
+    ],
+    "1": [
+     0.0166,
+     102288
+    ],
+    "2": [
+     0.0167,
+     101467
+    ],
+    "3": [
+     0.0164,
+     97261
+    ],
+    "4": [
+     0.0168,
+     102508
+    ],
+    "5": [
+     0.0168,
+     95271
+    ],
+    "6": [
+     0.0178,
+     100617
+    ]
+   }
+  },
+  "merchant_risk_score": {
+   "dtype": "float64",
+   "nunique_train": 950,
+   "nunique_test": 917,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 4e-05,
+   "mean_rows_per_value": 736.8,
+   "train_rows_with_value_seen_ge_5": 0.9997,
+   "drift": 0.0022,
+   "decimals": {
+    "0": 0.1036,
+    "1": 0.8964,
+    "2": 0.0
+   },
+   "min": 0.0,
+   "max": 100.0
+  },
+  "prior_disputes": {
+   "dtype": "int64",
+   "nunique_train": 5,
+   "nunique_test": 5,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 139992.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0008,
+   "target_rate_by_value": {
+    "0": [
+     0.0155,
+     598396
+    ],
+    "1": [
+     0.0236,
+     96365
+    ],
+    "2": [
+     0.03,
+     5032
+    ],
+    "3": [
+     0.0364,
+     165
+    ],
+    "4": [
+     0.0,
+     2
+    ]
+   }
+  },
+  "merchant_category": {
+   "dtype": "str",
+   "nunique_train": 12,
+   "nunique_test": 12,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 58330.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0023,
+   "target_rate_by_value": {
+    "Crypto Exchange": [
+     0.0653,
+     5285
+    ],
+    "Electronics": [
+     0.0308,
+     48693
+    ],
+    "Fuel": [
+     0.0124,
+     59880
+    ],
+    "Gaming": [
+     0.0551,
+     23784
+    ],
+    "Gift Cards": [
+     0.073,
+     9456
+    ],
+    "Groceries": [
+     0.0111,
+     142578
+    ],
+    "Healthcare": [
+     0.0129,
+     35889
+    ],
+    "Online Retail": [
+     0.0111,
+     155097
+    ],
+    "Restaurants": [
+     0.0114,
+     101360
+    ],
+    "Streaming": [
+     0.0225,
+     47196
+    ],
+    "Travel": [
+     0.0186,
+     28715
+    ],
+    "Utilities": [
+     0.0138,
+     42027
+    ]
+   }
+  },
+  "card_type": {
+   "dtype": "str",
+   "nunique_train": 5,
+   "nunique_test": 5,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 139992.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0011,
+   "target_rate_by_value": {
+    "Amex": [
+     0.019,
+     45797
+    ],
+    "Discover": [
+     0.0146,
+     17235
+    ],
+    "Mastercard": [
+     0.016,
+     254857
+    ],
+    "RuPay": [
+     0.0168,
+     37070
+    ],
+    "Visa": [
+     0.017,
+     345001
+    ]
+   }
+  },
+  "auth_method": {
+   "dtype": "str",
+   "nunique_train": 5,
+   "nunique_test": 5,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 139992.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0023,
+   "target_rate_by_value": {
+    "3D Secure": [
+     0.0147,
+     210036
+    ],
+    "Biometric": [
+     0.005,
+     93666
+    ],
+    "No Authentication": [
+     0.0644,
+     67060
+    ],
+    "OTP": [
+     0.0141,
+     175178
+    ],
+    "PIN": [
+     0.0087,
+     154020
+    ]
+   }
+  },
+  "channel": {
+   "dtype": "str",
+   "nunique_train": 5,
+   "nunique_test": 5,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 139992.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0021,
+   "target_rate_by_value": {
+    "ATM": [
+     0.0159,
+     30220
+    ],
+    "Contactless": [
+     0.0155,
+     105620
+    ],
+    "In-App": [
+     0.0163,
+     83716
+    ],
+    "Online": [
+     0.0174,
+     273939
+    ],
+    "POS": [
+     0.0166,
+     206465
+    ]
+   }
+  },
+  "device_type": {
+   "dtype": "str",
+   "nunique_train": 8,
+   "nunique_test": 8,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 87495.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0015,
+   "target_rate_by_value": {
+    "ATM Machine": [
+     0.017,
+     20877
+    ],
+    "Android Phone": [
+     0.0161,
+     237454
+    ],
+    "Mac": [
+     0.0171,
+     33973
+    ],
+    "POS Terminal": [
+     0.0173,
+     113237
+    ],
+    "Smart Watch": [
+     0.017,
+     21106
+    ],
+    "Tablet": [
+     0.017,
+     27688
+    ],
+    "Windows PC": [
+     0.0161,
+     80934
+    ],
+    "iPhone": [
+     0.0172,
+     164691
+    ]
+   }
+  },
+  "is_foreign_transaction": {
+   "dtype": "int64",
+   "nunique_train": 2,
+   "nunique_test": 2,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 349980.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0001,
+   "target_rate_by_value": {
+    "0": [
+     0.0148,
+     687862
+    ],
+    "1": [
+     0.1257,
+     12098
+    ]
+   }
+  },
+  "is_new_merchant": {
+   "dtype": "int64",
+   "nunique_train": 2,
+   "nunique_test": 2,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 349980.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0004,
+   "target_rate_by_value": {
+    "0": [
+     0.0112,
+     593240
+    ],
+    "1": [
+     0.0473,
+     106720
+    ]
+   }
+  },
+  "used_vpn": {
+   "dtype": "int64",
+   "nunique_train": 2,
+   "nunique_test": 2,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 349980.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0008,
+   "target_rate_by_value": {
+    "0": [
+     0.015,
+     676295
+    ],
+    "1": [
+     0.0655,
+     23665
+    ]
+   }
+  },
+  "ip_country_mismatch": {
+   "dtype": "int64",
+   "nunique_train": 2,
+   "nunique_test": 2,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 349980.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0001,
+   "target_rate_by_value": {
+    "0": [
+     0.0143,
+     688648
+    ],
+    "1": [
+     0.165,
+     11312
+    ]
+   }
+  },
+  "billing_shipping_mismatch": {
+   "dtype": "int64",
+   "nunique_train": 2,
+   "nunique_test": 2,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 349980.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0002,
+   "target_rate_by_value": {
+    "0": [
+     0.0152,
+     690906
+    ],
+    "1": [
+     0.1299,
+     9054
+    ]
+   }
+  },
+  "is_ai_generated_scam_attempt": {
+   "dtype": "int64",
+   "nunique_train": 2,
+   "nunique_test": 2,
+   "missing_train": 0,
+   "missing_test": 0,
+   "test_rows_unseen_in_train": 0.0,
+   "mean_rows_per_value": 349980.0,
+   "train_rows_with_value_seen_ge_5": 1.0,
+   "drift": 0.0001,
+   "target_rate_by_value": {
+    "0": [
+     0.0163,
+     697661
+    ],
+    "1": [
+     0.1522,
+     2299
+    ]
+   }
+  }
+ }
+}

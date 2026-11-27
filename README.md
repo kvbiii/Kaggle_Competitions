@@ -6,6 +6,8 @@ Welcome to the Kaggle Competitions Notebooks Repository! This repository contain
 
 This repository serves as a central hub for sharing and collaborating on notebooks related to Kaggle competitions. Whether you're a beginner looking to learn from others' solutions or an experienced data scientist sharing your insights, you'll find valuable resources here.
 
+Agent-loop competitions (from S6E11) add a folder contract next to the notebooks: `folds.npy`, `agent/facts.md`, `experiments/<idea>.py screen|full`, `oof/<member>.npz`, `submissions/` (the last three gitignored) and an `experiments.md` log.
+
 Kill any processes that are using the GPU before running the notebook to avoid out-of-memory errors. You can do this by running the following command in your terminal:
 
 ```bash
