@@ -98,3 +98,9 @@ Appended by `common.run_member` and `gate.py`. Trees: refit tree count (full) or
 | 11-27 10:44 | STACK logistic_stack [4 members] | full | 0.95058 | 0.94871 0.95083 0.94698 0.95052 0.95584 | vs best single +0.00032 | te_xgb=0.140 glm=0.084 xgb_d2_te=0.491 glm_boost=0.645 |
 | 11-27 10:48 | STACK hill_climb [5 members] | full | 0.95064 | 0.94870 0.95096 0.94703 0.95066 0.95588 | vs best single +0.00039 | te_xgb=0.045 glm=0.000 xgb_d2_te=0.318 glm_boost=0.500 baseline=0.136 |
 | 11-27 10:48 | STACK logistic_stack [5 members] | full | 0.95066 | 0.94874 0.95096 0.94705 0.95065 0.95589 | vs best single +0.00040 | te_xgb=0.042 glm=0.034 xgb_d2_te=0.452 glm_boost=0.687 baseline=0.146 |
+| 11-27 12:00 | lgbm31_raw | screen | 0.94321 | 0.93713 0.94626 0.94623 | 0.1 min | [136, 158, 183] |
+| 11-27 12:00 | QUEUE kill-check lgbm31_raw vs baseline | screen | 0.94321 vs 0.94416, Δ -0.00095, threshold -0.00112 | 3/3 folds down | GO |
+| 11-27 12:00 | QUEUE lgbm31_raw | full | est 1.8 min | started | - | - |
+| 11-27 12:02 | lgbm31_raw | full | 0.94503 | 0.94286 0.94630 0.94066 0.94524 0.95012 | 1.3 min | 286 |
+| 11-27 12:02 | GATE single lgbm31_raw vs baseline | full | Δ -0.00163 | Δ per fold -0.00178 -0.00120 -0.00191 -0.00157 -0.00168 | 0/5 up | FAIL |
+| 11-27 12:02 | QUEUE done queue_check.txt | - | - | - | - | - |
