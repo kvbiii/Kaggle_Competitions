@@ -59,6 +59,7 @@ class Member:
     features: list[str] = field(default_factory=lambda: list(FEATURES))
     pipeline: Pipeline | None = None
     config: dict = field(default_factory=dict)
+    offset_column: str | None = None
 
 
 def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -146,23 +147,23 @@ def log_line(text: str) -> None:
     print(text)
 
 
-def _es_param(model: BaseEstimator) -> str | None:
+def es_param(model: BaseEstimator) -> str | None:
     """Return the name of the model's active early-stopping parameter, if any."""
     params = model.get_params()
     return next((p for p in ES_PARAMS if params.get(p)), None)
 
 
-def _best_trees(model: BaseEstimator) -> int:
+def best_trees(model: BaseEstimator) -> int:
     """Return the number of trees at the best iteration of a fitted XGB or LGBM model."""
     if hasattr(model, "best_iteration_"):
         return int(model.best_iteration_)
     return int(model.best_iteration) + 1
 
 
-def _fit(member: Member, model: BaseEstimator, data: tuple, holdout: float | None) -> tuple[CrossValidationTrainer, np.ndarray]:
+def fit_cv(member: Member, model: BaseEstimator, data: tuple, holdout: float | None) -> tuple[CrossValidationTrainer, np.ndarray]:
     """Fit one CV pass of `model` on `(X, y, X_test or None, fold ids)`; return it and the test proba."""
     X, y, X_test, folds = data
-    trainer = CrossValidationTrainer("classification", "Roc AUC", cv=PredefinedSplit(folds), preprocessing_pipeline=member.pipeline, verbose=False, early_stopping_holdout=holdout)
+    trainer = CrossValidationTrainer("classification", "Roc AUC", cv=PredefinedSplit(folds), preprocessing_pipeline=member.pipeline, verbose=False, early_stopping_holdout=holdout, offset_column=member.offset_column)
     _, _, test_proba = trainer.fit(model, X, y, X_test)
     return trainer, np.empty(0) if test_proba is None else np.asarray(test_proba)[:, 1]
 
@@ -182,15 +183,15 @@ def run_member(member: Member, mode: str) -> dict:
     X_test = test[member.features] if mode == "full" else None
     data = (train.iloc[rows][member.features], train.iloc[rows][TARGET], X_test, fold_ids)
     start = time.perf_counter()
-    es = _es_param(member.model)
-    trainer, test_pred = _fit(member, member.model, data, ES_HOLDOUT if es else None)
+    es = es_param(member.model)
+    trainer, test_pred = fit_cv(member, member.model, data, ES_HOLDOUT if es else None)
     config = {**member.config, "mode": mode, "screen": SCREEN if mode == "screen" else None}
     if es:
-        config["best_trees"] = [_best_trees(m) for m in trainer.fitted_estimators_]
+        config["best_trees"] = [best_trees(m) for m in trainer.fitted_estimators_]
     if es and mode == "full":
         n_trees = math.ceil(REFIT_FACTOR * np.mean(config["best_trees"]))
         config["refit_trees"] = n_trees
-        trainer, test_pred = _fit(member, clone(member.model).set_params(n_estimators=n_trees, **{es: None}), data, None)
+        trainer, test_pred = fit_cv(member, clone(member.model).set_params(n_estimators=n_trees, **{es: None}), data, None)
     runtime = time.perf_counter() - start
     scored = fold_ids >= 0
     fold_auc = np.asarray(trainer.valid_scores_)
