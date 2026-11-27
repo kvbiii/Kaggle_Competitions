@@ -4,7 +4,14 @@ kaggle>=2.0.0
 kvbiii_ml>=0.1.0
 kvbiii_plots>=0.3.0
 lightgbm>=4.6.0
+pytabkit>=1.8.0
 xgboost>=3.2.0
+
+# kvbiii_ml is installed editable from the local checkout until the next PyPI release
+# (needs oof_predictions_, oof_ensembling and DigitKeysFeatureGenerator):
+# uv pip install --python Kaggle_Competitions_venv/bin/python -e ~/Desktop/KubiK/Programming/Python/Paczki/kvbiii-ml
+# pytabkit pulls torch (CUDA 13 wheels) and downgrades nvidia-nccl-cu13 2.32 -> 2.30;
+# XGBoost and LightGBM CUDA fits still pass after that (checked 2026-11-26).
 
 # To install lightgbm with CUDA support (requires system CUDA toolkit + gcc-12/g++-12 +
 # libnccl-dev already installed via apt, since nvcc 12.0 rejects the default gcc 13 on
