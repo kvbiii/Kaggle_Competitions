@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 from common import (
     CATEGORICAL,
     FEATURES,
@@ -19,6 +20,8 @@ from kvbiii_ml.modeling.training.cross_validation import CrossValidationTrainer
 from lightgbm import LGBMClassifier
 from realmlp import nn_pipeline
 from sklearn.model_selection import PredefinedSplit
+from xgb_d2_te_bag import bagged_pipeline
+from xgb_d2_te_gp import gp_pipeline
 
 CANARY_SEEDS = (2, 3, 4)
 
@@ -86,13 +89,14 @@ def test_glm_offsets_of_a_training_row_ignore_its_own_label() -> None:
     assert not np.allclose(offsets, offsets_flipped)
 
 
-def test_nn_pipeline_canary_shuffled_labels_give_chance_auc() -> None:
+@pytest.mark.parametrize("pipeline", [nn_pipeline, bagged_pipeline, gp_pipeline])
+def test_new_input_builders_canary_shuffled_labels_give_chance_auc(pipeline) -> None:
     train, _ = load_data()
     scores = []
     for seed in CANARY_SEEDS:
         sample = train.sample(60_000, random_state=seed)
         X = sample[FEATURES]
         y = pd.Series(np.random.default_rng(seed).permutation(sample["is_fraud"].to_numpy()), index=X.index)
-        trainer = CrossValidationTrainer("classification", "Roc AUC", cv=PredefinedSplit(make_folds(y.to_numpy())), preprocessing_pipeline=nn_pipeline(), verbose=False)
+        trainer = CrossValidationTrainer("classification", "Roc AUC", cv=PredefinedSplit(make_folds(y.to_numpy())), preprocessing_pipeline=pipeline(), verbose=False)
         scores.append(np.mean(trainer.fit(LGBMClassifier(n_estimators=100, num_leaves=15, verbosity=-1), X, y)[1]))
     assert abs(np.mean(scores) - 0.5) < 0.015

@@ -67,6 +67,11 @@ Submission file: `submissions/1127_1048_logistic_stack_5m.csv` (rank-scaled, tes
 | 9 | realmlp (pytabkit, S6E10 config, holdout epoch + n_refit=1) | 0.94993 | 0.94801 0.95069 0.94595 0.95017 0.95481 | +0.00001 (3) | 3/5 | FAIL (ρ 0.986, weight 0.125) | 9.0 min | 19.0 min |
 | 10 | tabm (tabm-mini k=32, pwl; no refit in pytabkit → 80% of fold) | 0.94932 | 0.94712 0.95008 0.94564 0.94896 0.95478 | −0.00001 (3) | 2/5 | FAIL (weight 0.000) | 33.0 min | 77.1 min |
 
+| 11 | xgb_d2_te_bag (TE training rows averaged over seeds 17/18/19) | — | screen 0.93648 0.94715 0.94958 | screen −0.00320 vs xgb_d2_te (threshold −0.00105) | 0/3 | KILL | 0.4 min (screen) | — |
+| 12 | xgb_d2_te_gp (+ deviations of 6 numerics from their per-category means, train-fold stats) | 0.95023 | 0.94838 0.95046 0.94657 0.95025 0.95549 | +0.00002 single vs xgb_d2_te | 3/5 | FAIL | 3.6 min | 4.6 min |
+
+The bagging kill is not a wrapper bug: `BaggedTargetEncoder` with the single seed 17 reproduces the xgb_d2_te screen exactly (0.93943 0.95123 0.95214). A likely cause: averaging lowers the noise of the training-row encodings, so the trees over-trust TE relative to the whole-fold valid/test encodings. Canaries (shuffled labels, seeds 2–4) pass for both new builders.
+
 Library after Phase 3 batches: `xgb_d2_te glm_boost baseline`. Logistic stack **0.95067** (hill climb 0.95065), up from 0.95066 with 5 members. NN canary (TE pipeline + integer categories, shuffled labels, seeds 2–4): 0.4916, same as the TE pipeline alone (0.4914); seed 0 gave 0.475, below chance, so not leakage.
 
 ## Run log
@@ -159,3 +164,11 @@ Appended by `common.run_member` and `gate.py`. Trees: refit tree count (full) or
 | 11-27 13:40 | REFIT xgb_d2_te (all rows) | full | test only | 2067 trees | 0.3 min | - |
 | 11-27 13:42 | STACK hill_climb_refit-glm_boost-xgb_d2_te [3 members] | full | 0.95065 | 0.94870 0.95096 0.94702 0.95067 0.95589 | vs best single +0.00039 | xgb_d2_te=0.341 glm_boost=0.512 baseline=0.146 |
 | 11-27 13:42 | STACK logistic_stack_refit-glm_boost-xgb_d2_te [3 members] | full | 0.95067 | 0.94874 0.95098 0.94703 0.95068 0.95589 | vs best single +0.00041 | xgb_d2_te=0.504 glm_boost=0.680 baseline=0.176 |
+| 11-27 13:51 | xgb_d2_te_bag | screen | 0.94440 | 0.93648 0.94715 0.94958 | 0.4 min | [2787, 2102, 1922] |
+| 11-27 13:51 | QUEUE kill-check xgb_d2_te_bag vs xgb_d2_te | screen | 0.94440 vs 0.94760, Δ -0.00320, threshold -0.00105 | 3/3 folds down | KILL |
+| 11-27 13:51 | xgb_d2_te_gp | screen | 0.94780 | 0.93974 0.95150 0.95215 | 0.3 min | [1611, 922, 1330] |
+| 11-27 13:51 | QUEUE kill-check xgb_d2_te_gp vs xgb_d2_te | screen | 0.94780 vs 0.94760, Δ +0.00020, threshold -0.00105 | 0/3 folds down | GO |
+| 11-27 13:51 | QUEUE xgb_d2_te_gp | full | est 4.6 min | started | - | - |
+| 11-27 13:55 | xgb_d2_te_gp | full | 0.95023 | 0.94838 0.95046 0.94657 0.95025 0.95549 | 3.6 min | 2092 |
+| 11-27 13:55 | GATE single xgb_d2_te_gp vs xgb_d2_te | full | Δ +0.00002 | Δ per fold -0.00012 -0.00017 +0.00023 +0.00011 +0.00004 | 3/5 up | FAIL |
+| 11-27 13:55 | QUEUE done batch3.txt | - | - | - | - | - |
