@@ -51,6 +51,8 @@ Submission file: `submissions/1127_1048_logistic_stack_5m.csv` (rank-scaled, tes
 |---|---|---|---|---|---|
 | 2026-11-02 | baseline notebook (OOF approach) | 0.9468 | 0.94677 | 2343/3274 (on 11-26) | user's own |
 | 2026-11-27 10:51 | `1127_1048_logistic_stack_5m.csv` | 0.95066 | **0.95170** | ~1039/3322 | approved by user; LB − CV = +0.00104 (the baseline had ≈ 0); public top-10% cutoff 0.95533 |
+| 2026-11-27 13:46 | `1127_1244_logistic_stack_3m.csv` (ref 59001979) | 0.95067 | 0.95167 | — | Phase 3 A, approved by user: pruned 3-member stack, test = fold average |
+| 2026-11-27 13:46 | `1127_1342_logistic_stack_3m_refit-glm_boost-xgb_d2_te.csv` (ref 59001983) | 0.95067 (same OOF) | **0.95173** | — | Phase 3 B, approved by user: same stack, glm_boost + xgb_d2_te test from one all-rows refit (lever 5). B − A = +0.00006 with file ρ 0.9988 (gap noise SD ≈ 3e-4·√(1−ρ) ≈ 1e-5) |
 
 ## Phase 3: queue runner (2026-11-27)
 
@@ -153,3 +155,7 @@ Appended by `common.run_member` and `gate.py`. Trees: refit tree count (full) or
 | 11-27 13:38 | tabm | full | 0.94932 | 0.94712 0.95008 0.94564 0.94896 0.95478 | 33.0 min | - |
 | 11-27 13:38 | GATE blend tabm vs [xgb_d2_te glm_boost baseline] | full | 0.95065 → 0.95064, Δ -0.00001 | Δ per fold +0.00000 -0.00000 -0.00002 -0.00001 +0.00000 | 2/5 up, weight 0.000, max ρ 0.97724 | FAIL |
 | 11-27 13:38 | QUEUE done batch2.txt | - | - | - | - | - |
+| 11-27 13:40 | REFIT glm_boost (all rows) | full | test only | 741 trees | 1.2 min | - |
+| 11-27 13:40 | REFIT xgb_d2_te (all rows) | full | test only | 2067 trees | 0.3 min | - |
+| 11-27 13:42 | STACK hill_climb_refit-glm_boost-xgb_d2_te [3 members] | full | 0.95065 | 0.94870 0.95096 0.94702 0.95067 0.95589 | vs best single +0.00039 | xgb_d2_te=0.341 glm_boost=0.512 baseline=0.146 |
+| 11-27 13:42 | STACK logistic_stack_refit-glm_boost-xgb_d2_te [3 members] | full | 0.95067 | 0.94874 0.95098 0.94703 0.95068 0.95589 | vs best single +0.00041 | xgb_d2_te=0.504 glm_boost=0.680 baseline=0.176 |
