@@ -52,6 +52,21 @@ Submission file: `submissions/1127_1048_logistic_stack_5m.csv` (rank-scaled, tes
 | 2026-11-02 | baseline notebook (OOF approach) | 0.9468 | 0.94677 | 2343/3274 (on 11-26) | user's own |
 | 2026-11-27 10:51 | `1127_1048_logistic_stack_5m.csv` | 0.95066 | **0.95170** | ~1039/3322 | approved by user; LB − CV = +0.00104 (the baseline had ≈ 0); public top-10% cutoff 0.95533 |
 
+## Phase 3: queue runner (2026-11-27)
+
+`experiments/run_queue.py <ideas.txt>` runs each line (`<idea> blend`, `<idea> single <ref>`, `prune`): screen → kill check → full → gate → library → re-stack, with each step recorded in `<ideas>.state.json` (resume). Kill rule (user, 2026-11-27): only `single` variants can be killed, iff the screen trails the reference by > 2% of (1 − ref AUC) **and** every scored fold is down; families always get a full run. Hours guard: a step starts only if its estimate (full = 18 × screen runtime) ends by 20:00. Pruning (user, 2026-11-27): drop the weakest leave-one-out member while it fails the gate, one per round.
+
+| # | member | single CV | per-fold CV | Δ blend (gate) | folds up | gate | runtime (full) | est. |
+|---|---|---|---|---|---|---|---|---|
+| check | lgbm31_raw via queue (single vs baseline) | 0.94503 | identical to Phase 2 (max fold diff 0.0) | −0.00163 single | 0/5 | FAIL (expected) | 1.3 min | 1.8 min |
+| 7 | catboost_cat (GPU, raw + string copies of every numeric/flag) | 0.94637 | 0.94442 0.94665 0.94198 0.94664 0.95218 | −0.00001 (5 members); −0.00001 (3) | 1/5; 2/5 | FAIL (ρ 0.963) | 24.6 min | 23.2 min |
+| 8 | glm_boost_lgbm4 (LGBM 4 leaves + GLM init_score) | **0.95029** | 0.94825 0.95042 0.94691 0.95031 0.95558 | +0.00002 (5); +0.00002 (3) | 5/5 | FAIL (ρ 0.9995 with glm_boost) | 8.8 min | 19.1 min |
+| prune | leave-one-out, 5 → 3 members | — | — | te_xgb −0.00000, then glm +0.00000 | 1/5, 3/5 | DROP both | 1 min | — |
+| 9 | realmlp (pytabkit, S6E10 config, holdout epoch + n_refit=1) | 0.94993 | 0.94801 0.95069 0.94595 0.95017 0.95481 | +0.00001 (3) | 3/5 | FAIL (ρ 0.986, weight 0.125) | 9.0 min | 19.0 min |
+| 10 | tabm (tabm-mini k=32, pwl; no refit in pytabkit → 80% of fold) | 0.94932 | 0.94712 0.95008 0.94564 0.94896 0.95478 | −0.00001 (3) | 2/5 | FAIL (weight 0.000) | 33.0 min | 77.1 min |
+
+Library after Phase 3 batches: `xgb_d2_te glm_boost baseline`. Logistic stack **0.95067** (hill climb 0.95065), up from 0.95066 with 5 members. NN canary (TE pipeline + integer categories, shuffled labels, seeds 2–4): 0.4916, same as the TE pipeline alone (0.4914); seed 0 gave 0.475, below chance, so not leakage.
+
 ## Run log
 
 Appended by `common.run_member` and `gate.py`. Trees: refit tree count (full) or best trees per fold (screen).
@@ -129,3 +144,12 @@ Appended by `common.run_member` and `gate.py`. Trees: refit tree count (full) or
 | 11-27 12:44 | QUEUE done batch1.txt | - | - | - | - | - |
 | 11-27 12:45 | GATE blend glm_boost_lgbm4 vs [xgb_d2_te glm_boost baseline] | full | 0.95065 → 0.95066, Δ +0.00002 | Δ per fold +0.00001 +0.00001 +0.00002 +0.00003 +0.00002 | 5/5 up, weight 0.524, max ρ 0.99949 | FAIL |
 | 11-27 12:45 | GATE blend catboost_cat vs [xgb_d2_te glm_boost baseline] | full | 0.95065 → 0.95064, Δ -0.00001 | Δ per fold -0.00000 -0.00002 -0.00001 +0.00001 +0.00000 | 2/5 up, weight 0.025, max ρ 0.96315 | FAIL |
+| 11-27 12:51 | realmlp | screen | 0.94804 | 0.94148 0.95163 0.95100 | 1.1 min | - |
+| 11-27 12:51 | QUEUE realmlp | full | est 19.0 min | started | - | - |
+| 11-27 13:00 | realmlp | full | 0.94993 | 0.94801 0.95069 0.94595 0.95017 0.95481 | 9.0 min | - |
+| 11-27 13:00 | GATE blend realmlp vs [xgb_d2_te glm_boost baseline] | full | 0.95065 → 0.95065, Δ +0.00001 | Δ per fold +0.00002 +0.00004 -0.00003 +0.00004 -0.00003 | 3/5 up, weight 0.125, max ρ 0.98617 | FAIL |
+| 11-27 13:04 | tabm | screen | 0.94717 | 0.94049 0.95038 0.95065 | 4.3 min | - |
+| 11-27 13:04 | QUEUE tabm | full | est 77.1 min | started | - | - |
+| 11-27 13:38 | tabm | full | 0.94932 | 0.94712 0.95008 0.94564 0.94896 0.95478 | 33.0 min | - |
+| 11-27 13:38 | GATE blend tabm vs [xgb_d2_te glm_boost baseline] | full | 0.95065 → 0.95064, Δ -0.00001 | Δ per fold +0.00000 -0.00000 -0.00002 -0.00001 +0.00000 | 2/5 up, weight 0.000, max ρ 0.97724 | FAIL |
+| 11-27 13:38 | QUEUE done batch2.txt | - | - | - | - | - |
